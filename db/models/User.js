@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Post = require("./Post");
+const Like = require("./Like");
 
 const userSchema = mongoose.Schema({
   email: {
@@ -29,6 +31,12 @@ const userSchema = mongoose.Schema({
       }
     }
   ]
+});
+
+userSchema.virtual("posts", {
+  ref: "Post",
+  localField: "_id",
+  foreignField: "owner"
 });
 
 userSchema.statics.findByCredentials = async (email, pwd) => {
@@ -71,6 +79,13 @@ userSchema.pre("save", async function(next) {
   if (user.isModified("passwordHash")) {
     user.passwordHash = await bcrypt.hash(user.passwordHash, 8);
   }
+  next();
+});
+
+userSchema.pre("remove", async function(next) {
+  const user = this;
+  await Post.deleteMany({ owner: user._id });
+  await Like.deleteMany({ owner: user._id });
   next();
 });
 

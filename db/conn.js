@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
+cosnt {dbURL} = require('../config')
 
 mongoose.connect(
-  "mongodb://admin:pololo123@ds163016.mlab.com:63016/node_social",
+  dbURL,
   { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true }
 );

@@ -10,8 +10,7 @@ router.post("/register", async (req, res) => {
     const user = await newUser.save();
     const token = await user.generateAuthToken();
     res.status(201).json({
-      msg: "user signed up",
-      data: user,
+      user,
       token
     });
   } catch (e) {
@@ -28,8 +27,8 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findByCredentials(email, pwd);
     const token = await user.generateAuthToken();
-    res.status(200).json({
-      data: user,
+    res.status(200).send({
+      user,
       token
     });
   } catch (e) {
@@ -40,7 +39,6 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", auth, async (req, res) => {
-  console.log(req.token);
   try {
     req.user.tokens = req.user.tokens.filter(token => token.token != req.token);
     await req.user.save();
@@ -56,6 +54,36 @@ router.post("/logoutAll", auth, (req, res) => {
     req.user.tokens = [];
     req.user.save();
     res.status(200).send();
+  } catch (e) {
+    res.status(500).send();
+  }
+});
+
+router.get("/me", auth, (req, res) => {
+  res.status(200).send(req.user);
+});
+
+router.patch("/me", auth, async (req, res) => {
+  const permittedUpdates = ["nickName", "email", "profileImg"];
+  try {
+    for (let up in req.body) {
+      if (permittedUpdates.includes(up)) {
+        req.user[up] = req.body[up];
+      } else {
+        throw new Error("updaten not permited");
+      }
+    }
+    await req.user.save();
+    res.status(200).send();
+  } catch (e) {
+    res.status(500).send({ msg: e.message });
+  }
+});
+
+router.delete("/me", auth, async (req, res) => {
+  try {
+    await req.user.remove();
+    res.status(200).send(req.user);
   } catch (e) {
     res.status(500).send();
   }
