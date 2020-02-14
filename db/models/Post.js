@@ -7,6 +7,10 @@ const postSchema = mongoose.Schema({
     default: Date.now
   },
   image: String,
+  likeCount: {
+    type: Number,
+    default: 0
+  },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,

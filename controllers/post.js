@@ -71,6 +71,9 @@ router.post("/like", auth, async (req, res) => {
     }
     const like = new Like({ owner: userId, post: postId });
     await like.save();
+    const likedPost = await Post.findById(postId);
+    likedPost.likeCount++;
+    likedPost.save();
     res.status(201).send();
   } catch (e) {
     res.status(500).send({ msg: e.message });
