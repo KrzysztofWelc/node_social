@@ -10,7 +10,7 @@ router.post("/add", auth, async (req, res) => {
     await post.save();
     res.status(201).send(post);
   } catch (e) {
-    res.status(400).send();
+    res.status(400).send({ msg: e.message });
   }
 });
 
@@ -84,10 +84,18 @@ router.post("/dislike", auth, async (req, res) => {
     const userId = req.user._id;
     const postId = req.body.postId;
 
-    await Like.deleteOne({ owner: userId, post: postId });
-    res.status(200).send();
+    const usersLike = await Like.findOne({ owner: userId, post: postId });
+    if (usersLike) {
+      usersLike.remove();
+      const likedPost = await Post.findById(postId);
+      likedPost.likeCount--;
+      likedPost.save();
+      res.status(200).send();
+    } else {
+      throw new Error("You haven't liked this post before");
+    }
   } catch (e) {
-    res.status(500).send();
+    res.status(500).send({ msg: e.message });
   }
 });
 
