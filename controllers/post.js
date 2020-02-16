@@ -38,10 +38,10 @@ router.get("/:id/image", async (req, res) => {
   }
 });
 
-router.get("/:id", auth, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await Post.findOne({ _id: id, owner: req.user._id });
+    const post = await Post.findById(id);
     if (!post)
       return res.status(401).send({ msg: "you are not author of this post" });
     res.status(200).send(post);
