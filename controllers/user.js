@@ -2,7 +2,7 @@ const router = require("express").Router();
 const User = require("../db/models/User");
 const auth = require("../middleware/auth");
 
-const upload = require("../utils/upload");
+const upload = require("../middleware/upload");
 
 router.post(
   "/register",
@@ -92,13 +92,13 @@ router.get("/me", auth, (req, res) => {
 });
 
 router.patch("/me", auth, async (req, res) => {
-  const permittedUpdates = ["nickName", "email", "profileImg"];
+  const permittedUpdates = ["nickName", "email", "passwordHash"];
   try {
     for (let up in req.body) {
       if (permittedUpdates.includes(up)) {
         req.user[up] = req.body[up];
       } else {
-        throw new Error("updaten not permited");
+        throw new Error("update not permited");
       }
     }
     await req.user.save();
