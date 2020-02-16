@@ -6,7 +6,7 @@ const postSchema = mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  image: Buffer,
+  image: { type: Buffer },
   likeCount: {
     type: Number,
     default: 0
@@ -24,5 +24,14 @@ postSchema.pre("remove", async function(next) {
   next();
 });
 
+postSchema.methods.toJSON = function() {
+  const post = this;
+
+  const postObject = post.toObject();
+
+  delete postObject.image;
+
+  return postObject;
+};
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;

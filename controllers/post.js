@@ -1,16 +1,32 @@
 const router = require("express").Router();
 const auth = require("../middleware/auth");
+const upload = require("../middleware/upload");
 const Post = require("../db/models/Post");
 const Like = require("../db/models/Like");
 
-router.post("/add", auth, async (req, res) => {
+router.post("/add", auth, upload.single("image"), async (req, res) => {
   const post = new Post({ ...req.body, owner: req.user._id });
-
+  if (req.file) post.image = req.file.buffer;
   try {
     await post.save();
     res.status(201).send(post);
   } catch (e) {
     res.status(400).send({ msg: e.message });
+  }
+});
+
+router.get("/:id/image", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post || !post.image) {
+      throw new Error("no such an image");
+    }
+
+    res.set("Content-Type", "image/jpg");
+    res.send(post.image);
+  } catch (e) {
+    res.status(404).send({ msg: e.message });
   }
 });
 

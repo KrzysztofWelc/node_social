@@ -82,7 +82,7 @@ router.get("/:id/avatar", async (req, res) => {
     res.set("Content-Type", "image/jpg");
     res.send(user.avatar);
   } catch (e) {
-    res.status(404).send();
+    res.status(404).send({ msg: e.message });
   }
 });
 
