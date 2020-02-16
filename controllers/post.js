@@ -4,16 +4,24 @@ const upload = require("../middleware/upload");
 const Post = require("../db/models/Post");
 const Like = require("../db/models/Like");
 
-router.post("/add", auth, upload.single("image"), async (req, res) => {
-  const post = new Post({ ...req.body, owner: req.user._id });
-  if (req.file) post.image = req.file.buffer;
-  try {
-    await post.save();
-    res.status(201).send(post);
-  } catch (e) {
-    res.status(400).send({ msg: e.message });
+router.post(
+  "/add",
+  auth,
+  upload.single("image"),
+  async (req, res) => {
+    const post = new Post({ ...req.body, owner: req.user._id });
+    if (req.file) post.image = req.file.buffer;
+    try {
+      await post.save();
+      res.status(201).send(post);
+    } catch (e) {
+      res.status(400).send({ msg: e.message });
+    }
+  },
+  (err, req, res) => {
+    res.status(500).send({ msg: err.message });
   }
-});
+);
 
 router.get("/:id/image", async (req, res) => {
   try {
@@ -49,7 +57,7 @@ router.patch("/:id", auth, async (req, res) => {
     if (!post) {
       return res.status(401).send({ msg: "you are not author of this post" });
     }
-    const permittedUpdates = ["body", "image"];
+    const permittedUpdates = ["body"];
     for (let up in req.body) {
       if (permittedUpdates.includes(up)) {
         post[up] = req.body[up];
