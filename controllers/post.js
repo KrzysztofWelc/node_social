@@ -50,25 +50,40 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.patch("/:id", auth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const post = await Post.findOne({ _id: id, owner: req.user._id });
-    if (!post) {
-      return res.status(401).send({ msg: "you are not author of this post" });
-    }
-    const permittedUpdates = ["body"];
-    for (let up in req.body) {
-      if (permittedUpdates.includes(up)) {
-        post[up] = req.body[up];
+router.patch(
+  "/:id",
+  auth,
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const post = await Post.findOne({ _id: id, owner: req.user._id });
+      if (!post) {
+        return res.status(401).send({ msg: "you are not author of this post" });
       }
+      const permittedUpdates = ["body"];
+      for (let up in req.body) {
+        if (permittedUpdates.includes(up)) {
+          post[up] = req.body[up];
+        }
+      }
+      if (req.file) {
+        console.log("updated image");
+
+        post.image = req.file.buffer;
+      } else if (req.body.delImage) {
+        console.log("deleted image");
+
+        post.image = undefined;
+      }
+      await post.save();
+      res.status(200).send(post);
+    } catch (e) {
+      res.status(401).send({ msg: e.message });
     }
-    await post.save();
-    res.status(200).send(post);
-  } catch (e) {
-    res.status(401).send({ msg: e.message });
-  }
-});
+  },
+  (err, req, res) => {}
+);
 
 router.delete("/:id", auth, async (req, res) => {
   try {
