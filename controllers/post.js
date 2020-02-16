@@ -82,7 +82,9 @@ router.patch(
       res.status(401).send({ msg: e.message });
     }
   },
-  (err, req, res) => {}
+  (err, req, res) => {
+    res.status(500).send({ msg: err.message });
+  }
 );
 
 router.delete("/:id", auth, async (req, res) => {
