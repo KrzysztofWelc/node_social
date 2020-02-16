@@ -24,8 +24,7 @@ router.post(
       });
     } catch (e) {
       res.status(500).json({
-        msg: "server error",
-        error: e.message
+        msg: e.message
       });
     }
   },
@@ -114,6 +113,37 @@ router.delete("/me", auth, async (req, res) => {
     res.status(200).send(req.user);
   } catch (e) {
     res.status(500).send();
+  }
+});
+
+router.patch(
+  "/me/avatar",
+  auth,
+  upload.single("avatar"),
+  async (req, res) => {
+    if (req.file) {
+      try {
+        req.user.avatar = req.file.buffer;
+        await req.user.save();
+        res.status(200).send();
+      } catch (e) {
+        res.status(500).send({ msg: e.message });
+      }
+    }
+  },
+  (err, req, res) => {
+    res.status(500).send({ msg: err.message });
+  }
+);
+
+router.delete("/me/avatar", auth, async (req, res) => {
+  try {
+    // delete req.user.avatar;
+    req.user.avatar = undefined;
+    await req.user.save();
+    res.status(200).send();
+  } catch (e) {
+    res.status(500).send({ msg: e.message });
   }
 });
 
