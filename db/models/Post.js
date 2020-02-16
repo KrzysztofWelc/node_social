@@ -6,7 +6,7 @@ const postSchema = mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  image: String,
+  image: Buffer,
   likeCount: {
     type: Number,
     default: 0

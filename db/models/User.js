@@ -19,9 +19,8 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true
   },
-  profileImg: {
-    type: String,
-    default: "default.jpg"
+  avatar: {
+    type: Buffer
   },
   tokens: [
     {
@@ -70,6 +69,7 @@ userSchema.methods.toJSON = function() {
 
   delete userObject.passwordHash;
   delete userObject.tokens;
+  delete userObject.avatar;
 
   return userObject;
 };

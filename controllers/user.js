@@ -2,24 +2,37 @@ const router = require("express").Router();
 const User = require("../db/models/User");
 const auth = require("../middleware/auth");
 
-router.post("/register", async (req, res) => {
-  const { email, nickName, password } = req.body;
+const upload = require("../utils/upload");
 
-  const newUser = new User({ email, nickName, passwordHash: password });
-  try {
-    const user = await newUser.save();
-    const token = await user.generateAuthToken();
-    res.status(201).json({
-      user,
-      token
-    });
-  } catch (e) {
-    res.status(500).json({
-      msg: "server error",
-      error: e.message
-    });
+router.post(
+  "/register",
+  upload.single("avatar"),
+  async (req, res) => {
+    const { email, nickName, password } = req.body;
+    // console.log(Boolean(req.file));
+
+    const newUser = new User({ email, nickName, passwordHash: password });
+    if (req.file) {
+      newUser.avatar = req.file.buffer;
+    }
+    try {
+      const user = await newUser.save();
+      const token = await user.generateAuthToken();
+      res.status(201).json({
+        user,
+        token
+      });
+    } catch (e) {
+      res.status(500).json({
+        msg: "server error",
+        error: e.message
+      });
+    }
+  },
+  (err, req, res) => {
+    res.status(400).send({ err: err.message });
   }
-});
+);
 
 router.post("/login", async (req, res) => {
   const email = req.body.email;
@@ -56,6 +69,21 @@ router.post("/logoutAll", auth, (req, res) => {
     res.status(200).send();
   } catch (e) {
     res.status(500).send();
+  }
+});
+
+router.get("/:id/avatar", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.avatar) {
+      throw new Error("no such an image");
+    }
+
+    res.set("Content-Type", "image/jpg");
+    res.send(user.avatar);
+  } catch (e) {
+    res.status(404).send();
   }
 });
 
