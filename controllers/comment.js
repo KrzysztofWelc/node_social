@@ -11,15 +11,18 @@ router.post(
     const userId = req.user._id;
     const postId = req.body.postId;
     const body = req.body.body;
-
-    const newComment = new Comment({
-      commentedPostId: postId,
-      author: userId,
-      body
-    });
-    if (req.file) newComment.image = req.file.buffer;
-    await newComment.save();
-    res.status(200).send();
+    try {
+      const newComment = new Comment({
+        commentedPostId: postId,
+        author: userId,
+        body
+      });
+      if (req.file) newComment.image = req.file.buffer;
+      await newComment.save();
+      res.status(200).send();
+    } catch (e) {
+      res.status(500).send({ msg: e.message });
+    }
   },
   (err, req, res, next) => {
     res.status(500).send({ msg: err.message });
