@@ -60,4 +60,20 @@ router.patch(
   }
 );
 
+router.delete("/:id", auth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const comment = await Comment.findOne({ _id: id, author: req.user._id });
+    if (!comment) {
+      return res
+        .status(401)
+        .send({ msg: "you are not author of this comment" });
+    }
+    await comment.remove();
+    res.status(200).send();
+  } catch (e) {
+    res.status(500).send({ msg: e.message });
+  }
+});
+
 module.exports = router;
