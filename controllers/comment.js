@@ -22,7 +22,38 @@ router.post(
     res.status(200).send();
   },
   (err, req, res, next) => {
-    res.send({ msg: err.message });
+    res.status(500).send({ msg: err.message });
+  }
+);
+
+router.patch(
+  "/:id",
+  auth,
+  upload.single("image"),
+  async (req, res) => {
+    const { id } = req.params;
+    try {
+      const comment = await Comment.findOne({ author: req.user._id, _id: id });
+      if (!comment) {
+        return res
+          .status(401)
+          .send({ msg: "you are not author of this comment" });
+      }
+      comment.body = req.body.body;
+
+      if (req.file) {
+        comment.image = req.file.buffer;
+      } else if (req.body.delImage) {
+        comment.image = undefined;
+      }
+      await comment.save();
+      res.status(200).send();
+    } catch (e) {
+      res.status(500).send({ msg: e.message });
+    }
+  },
+  (err, req, res, next) => {
+    res.status(500).send({ msg: err.message });
   }
 );
 
