@@ -18,6 +18,12 @@ const postSchema = mongoose.Schema({
   }
 });
 
+postSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "author"
+});
+
 postSchema.pre("remove", async function(next) {
   const post = this;
   await Like.deleteMany({ post: post._id });
