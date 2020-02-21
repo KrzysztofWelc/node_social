@@ -46,9 +46,7 @@ router.delete('/',
             const comment = post.comments.id(commentId);
 
             if (String(comment.authorId) == String(user._id)) {
-                post.comments = post.comments.filter(com => {
-                    return com._id != commentId
-                });
+                comment.remove();
                 await post.save();
                 res.status(200).send();
             } else {
