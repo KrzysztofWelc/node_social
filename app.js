@@ -7,6 +7,8 @@ require("./db/conn");
 
 const userController = require("./controllers/user");
 const postController = require("./controllers/post");
+const commentController = require("./controllers/comment");
+
 
 app.use(bodyParser.urlencoded({
   extended: false
@@ -15,6 +17,7 @@ app.use(bodyParser.json());
 
 app.use("/user", userController);
 app.use("/post", postController);
+app.use('/comment', commentController);
 
 app.listen(PORT, e => {
   if (e) return console.log("==ERROR==", e);

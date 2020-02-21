@@ -8,29 +8,39 @@ router.post(
   "/register",
   upload.single("avatar"),
   async (req, res) => {
-    const { email, nickName, password } = req.body;
-    // console.log(Boolean(req.file));
+      const {
+        email,
+        nickName,
+        password
+      } = req.body;
+      // console.log(Boolean(req.file));
 
-    const newUser = new User({ email, nickName, passwordHash: password });
-    if (req.file) {
-      newUser.avatar = req.file.buffer;
-    }
-    try {
-      const user = await newUser.save();
-      const token = await user.generateAuthToken();
-      res.status(201).json({
-        user,
-        token
+      const newUser = new User({
+        email,
+        nickName,
+        passwordHash: password
       });
-    } catch (e) {
-      res.status(500).json({
-        msg: e.message
+      if (req.file) {
+        newUser.avatar = req.file.buffer;
+      }
+      try {
+        const user = await newUser.save();
+        const token = await user.generateAuthToken();
+        res.status(201).json({
+          user,
+          token
+        });
+      } catch (e) {
+        res.status(500).json({
+          msg: e.message
+        });
+      }
+    },
+    (err, req, res, next) => {
+      res.status(400).send({
+        err: err.message
       });
     }
-  },
-  (err, req, res) => {
-    res.status(400).send({ err: err.message });
-  }
 );
 
 router.post("/login", async (req, res) => {
@@ -82,7 +92,9 @@ router.get("/:id/avatar", async (req, res) => {
     res.set("Content-Type", "image/jpg");
     res.send(user.avatar);
   } catch (e) {
-    res.status(404).send({ msg: e.message });
+    res.status(404).send({
+      msg: e.message
+    });
   }
 });
 
@@ -103,7 +115,9 @@ router.patch("/me", auth, async (req, res) => {
     await req.user.save();
     res.status(200).send();
   } catch (e) {
-    res.status(500).send({ msg: e.message });
+    res.status(500).send({
+      msg: e.message
+    });
   }
 });
 
@@ -121,29 +135,34 @@ router.patch(
   auth,
   upload.single("avatar"),
   async (req, res) => {
-    if (req.file) {
-      try {
-        req.user.avatar = req.file.buffer;
-        await req.user.save();
-        res.status(200).send();
-      } catch (e) {
-        res.status(500).send({ msg: e.message });
+      if (req.file) {
+        try {
+          req.user.avatar = req.file.buffer;
+          await req.user.save();
+          res.status(200).send();
+        } catch (e) {
+          res.status(500).send({
+            msg: e.message
+          });
+        }
       }
+    },
+    (err, req, res, next) => {
+      res.status(500).send({
+        msg: err.message
+      });
     }
-  },
-  (err, req, res) => {
-    res.status(500).send({ msg: err.message });
-  }
 );
 
 router.delete("/me/avatar", auth, async (req, res) => {
   try {
-    // delete req.user.avatar;
     req.user.avatar = undefined;
     await req.user.save();
     res.status(200).send();
   } catch (e) {
-    res.status(500).send({ msg: e.message });
+    res.status(500).send({
+      msg: e.message
+    });
   }
 });
 
