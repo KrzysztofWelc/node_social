@@ -34,4 +34,34 @@ router.post('/add',
             })
         })
 
+router.delete('/',
+    auth,
+    async (req, res) => {
+        try {
+            const user = req.user;
+            const postId = req.body.postId;
+            const commentId = req.body.commentId;
+
+            const post = await Post.findById(postId);
+            const comment = post.comments.id(commentId);
+
+            if (String(comment.authorId) == String(user._id)) {
+                post.comments = post.comments.filter(com => {
+                    return com._id != commentId
+                });
+                await post.save();
+                res.status(200).send();
+            } else {
+                res.status(401).send({
+                    msg: 'you are not author of this comment'
+                })
+            }
+        } catch (e) {
+            res.status(500).send({
+                msg: e.message
+            })
+        }
+    }
+)
+
 module.exports = router
