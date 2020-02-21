@@ -3,6 +3,7 @@ const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
 const Post = require("../db/models/Post");
 const Like = require("../db/models/Like");
+// const Comment = require("../db/models/Comment");
 
 router.post(
   "/add",
@@ -22,6 +23,21 @@ router.post(
     res.status(500).send({ msg: err.message });
   }
 );
+
+router.get("/:id/allComments", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Post.findById(id);
+    await post.populate("comments").execPopulate();
+
+    res.status(200).send({
+      post,
+      comments: post.comments
+    });
+  } catch (e) {
+    res.status(500).send({ msg: e.message });
+  }
+});
 
 router.get("/:id/image", async (req, res) => {
   try {
