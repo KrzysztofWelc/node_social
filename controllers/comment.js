@@ -34,6 +34,42 @@ router.post('/add',
             })
         })
 
+router.patch('/',
+    auth,
+    upload.single('image'),
+    async (req, res) => {
+            try {
+                const {
+                    postId,
+                    commentId,
+                    body
+                } = req.body;
+                const userId = req.user._id;
+
+                const post = await Post.findById(postId);
+                const comment = post.comments.id(commentId);
+                if (String(comment.authorId) == String(userId)) {
+                    if (body) comment.body = body;
+                    if (req.file) comment.image = req.file.buffer;
+                    await post.save();
+                    res.status(200).send();
+                } else {
+                    res.status(401).send({
+                        msg: 'you are not author of this post'
+                    });
+                }
+            } catch (e) {
+                res.status(500).send({
+                    msg: e.message
+                });
+            }
+        },
+        (err, req, res, next) => {
+            res.status(500).send({
+                msg: err.message
+            });
+        })
+
 router.delete('/',
     auth,
     async (req, res) => {
