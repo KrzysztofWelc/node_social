@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Post = require("./Post");
 const Like = require("./Like");
+const followSchema = require('./followSchema');
 
 const userSchema = mongoose.Schema({
   email: {
@@ -22,14 +23,15 @@ const userSchema = mongoose.Schema({
   avatar: {
     type: Buffer
   },
-  tokens: [
-    {
-      token: {
-        type: String,
-        required: true
-      }
+  follows: [
+    followSchema
+  ],
+  tokens: [{
+    token: {
+      type: String,
+      required: true
     }
-  ]
+  }]
 });
 
 userSchema.virtual("posts", {
@@ -39,7 +41,9 @@ userSchema.virtual("posts", {
 });
 
 userSchema.statics.findByCredentials = async (email, pwd) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({
+    email
+  });
   if (!user) {
     throw new Error("unable to login");
   }
@@ -52,17 +56,20 @@ userSchema.statics.findByCredentials = async (email, pwd) => {
   return user;
 };
 
-userSchema.methods.generateAuthToken = async function() {
+userSchema.methods.generateAuthToken = async function () {
   const user = this;
-  const token = jwt.sign({ _id: user._id.toString() }, "secret");
+  const token = jwt.sign({
+    _id: user._id.toString()
+  }, "secret");
 
-  user.tokens = user.tokens.concat({ token });
+  user.tokens = user.tokens.concat({
+    token
+  });
   await user.save();
 
   return token;
 };
-
-userSchema.methods.toJSON = function() {
+userSchema.methods.toJSON = function () {
   const user = this;
 
   const userObject = user.toObject();
@@ -74,7 +81,7 @@ userSchema.methods.toJSON = function() {
   return userObject;
 };
 
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
   const user = this;
   if (user.isModified("passwordHash")) {
     user.passwordHash = await bcrypt.hash(user.passwordHash, 8);
@@ -82,10 +89,14 @@ userSchema.pre("save", async function(next) {
   next();
 });
 
-userSchema.pre("remove", async function(next) {
+userSchema.pre("remove", async function (next) {
   const user = this;
-  await Post.deleteMany({ owner: user._id });
-  await Like.deleteMany({ owner: user._id });
+  await Post.deleteMany({
+    owner: user._id
+  });
+  await Like.deleteMany({
+    owner: user._id
+  });
   next();
 });
 

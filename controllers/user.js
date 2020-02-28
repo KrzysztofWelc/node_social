@@ -43,6 +43,31 @@ router.post(
     }
 );
 
+router.post('/follow', auth, async (req, res) => {
+  const user = req.user;
+  //user who will be followed 
+  const userId = req.body.userId;
+  try {
+    if (user._id == userId) throw new Error('you can not follow yourself :(');
+
+    user.follows.forEach(follow => {
+      if (follow.userId == userId) throw new Error('you already follow this user')
+    });
+
+    user.follows = user.follows.concat({
+      userId
+    });
+
+    await user.save();
+
+    res.status(201).send();
+  } catch (e) {
+    res.status(500).send({
+      msg: e.message
+    });
+  }
+})
+
 router.post("/login", async (req, res) => {
   const email = req.body.email;
   const pwd = req.body.password;
