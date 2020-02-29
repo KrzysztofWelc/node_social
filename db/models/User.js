@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Post = require("./Post");
 const Like = require("./Like");
-const followSchema = require('./followSchema');
 
 const userSchema = mongoose.Schema({
   email: {
@@ -23,15 +22,18 @@ const userSchema = mongoose.Schema({
   avatar: {
     type: Buffer
   },
-  follows: [
-    followSchema
-  ],
   tokens: [{
     token: {
       type: String,
       required: true
     }
   }]
+});
+
+userSchema.virtual("follows", {
+  ref: "Follow",
+  localField: "_id",
+  foreignField: "ownerId"
 });
 
 userSchema.virtual("posts", {
