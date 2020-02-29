@@ -66,6 +66,22 @@ router.post('/follow', auth, async (req, res) => {
   }
 })
 
+router.delete('/follow', auth, async (req, res) => {
+  const user = req.user;
+  const userToUnfollow = req.body.userId;
+  try {
+    await Follow.deleteOne({
+      ownerId: user._id,
+      followedId: userToUnfollow
+    })
+    res.status(200).send();
+  } catch (e) {
+    res.status(500).send({
+      msg: e.message
+    })
+  }
+})
+
 router.post("/login", async (req, res) => {
   const email = req.body.email;
   const pwd = req.body.password;
