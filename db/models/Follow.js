@@ -7,7 +7,8 @@ const commentSchema = mongoose.Schema({
     },
     followedId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true
+        required: true,
+        ref: 'User'
     }
 });
 

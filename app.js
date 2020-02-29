@@ -9,6 +9,7 @@ require("./db/conn");
 const userController = require("./controllers/user");
 const postController = require("./controllers/post");
 const commentController = require("./controllers/comment");
+const pageController = require('./controllers/page');
 
 
 app.use(bodyParser.urlencoded({
@@ -20,6 +21,7 @@ app.use(cors())
 app.use("/user", userController);
 app.use("/post", postController);
 app.use('/comment', commentController);
+app.use('/page', pageController);
 
 app.listen(PORT, e => {
   if (e) return console.log("==ERROR==", e);
