@@ -141,6 +141,23 @@ router.get("/me", auth, (req, res) => {
   res.status(200).send(req.user);
 });
 
+router.get('/shallow/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).send();
+    console.log(user);
+
+    res.status(200).send({
+      id: user._id,
+      nickName: user.nickName
+    })
+  } catch (e) {
+    res.status(500).send({
+      msg: e.message
+    });
+  }
+});
+
 router.patch("/me", auth, async (req, res) => {
   const permittedUpdates = ["nickName", "email", "passwordHash"];
   try {
