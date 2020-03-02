@@ -80,7 +80,7 @@ userSchema.methods.setAvatar = async function (buffer) {
   user.avatar = avatar;
   user.smallAvatar = smallAvatar;
 
-  await user.save();
+  // await user.save();
 
 }
 
@@ -105,6 +105,7 @@ userSchema.methods.toJSON = function () {
   delete userObject.passwordHash;
   delete userObject.tokens;
   delete userObject.avatar;
+  delete userObject.smallAvatar;
 
   return userObject;
 };

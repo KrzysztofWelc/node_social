@@ -25,10 +25,9 @@ router.post(
         await newUser.setAvatar(req.file.buffer);
       }
       try {
-        const user = await newUser.save();
-        const token = await user.generateAuthToken();
+        const token = await newUser.generateAuthToken();
         res.status(201).json({
-          user,
+          user: newUser,
           token
         });
       } catch (e) {
