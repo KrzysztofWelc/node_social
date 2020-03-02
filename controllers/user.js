@@ -209,7 +209,8 @@ router.patch(
   async (req, res) => {
       if (req.file) {
         try {
-          req.user.avatar = req.file.buffer;
+          // req.user.avatar = req.file.buffer;
+          await req.user.setAvatar(req.file.buffer);
           await req.user.save();
           res.status(200).send();
         } catch (e) {
