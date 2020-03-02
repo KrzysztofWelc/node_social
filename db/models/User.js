@@ -70,7 +70,7 @@ userSchema.methods.setAvatar = async function (buffer) {
   const avatar = await sharp(buffer).resize({
     width: 250,
     height: 250
-  }).jpeg().toBuffer();
+  }).png().toBuffer();
 
   const smallAvatar = await sharp(buffer).resize({
     width: 50,
