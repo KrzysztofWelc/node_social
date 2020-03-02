@@ -136,6 +136,23 @@ router.get("/:id/avatar", async (req, res) => {
   }
 });
 
+router.get("/:id/smallAvatar", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user || !user.smallAvatar) {
+      throw new Error("no such an image");
+    }
+
+    res.set("Content-Type", "image/jpg");
+    res.send(user.smallAvatar);
+  } catch (e) {
+    res.status(404).send({
+      msg: e.message
+    });
+  }
+});
+
 router.get("/me", auth, (req, res) => {
   res.status(200).send(req.user);
 });
