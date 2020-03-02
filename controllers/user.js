@@ -22,7 +22,7 @@ router.post(
         passwordHash: password
       });
       if (req.file) {
-        newUser.avatar = req.file.buffer;
+        await newUser.setAvatar(req.file.buffer);
       }
       try {
         const user = await newUser.save();

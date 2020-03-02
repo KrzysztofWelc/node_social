@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const sharp = require('sharp');
 const jwt = require("jsonwebtoken");
 const Post = require("./Post");
 const Like = require("./Like");
+
 
 const userSchema = mongoose.Schema({
   email: {
@@ -19,7 +21,12 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  //200x200
   avatar: {
+    type: Buffer
+  },
+  //50x50
+  smallAvatar: {
     type: Buffer
   },
   tokens: [{
@@ -57,6 +64,25 @@ userSchema.statics.findByCredentials = async (email, pwd) => {
 
   return user;
 };
+
+userSchema.methods.setAvatar = async function (buffer) {
+  const user = this;
+  const avatar = await sharp(buffer).resize({
+    width: 250,
+    height: 250
+  }).jpeg().toBuffer();
+
+  const smallAvatar = await sharp(buffer).resize({
+    width: 50,
+    height: 50
+  }).jpeg().toBuffer();
+
+  user.avatar = avatar;
+  user.smallAvatar = smallAvatar;
+
+  await user.save();
+
+}
 
 userSchema.methods.generateAuthToken = async function () {
   const user = this;
