@@ -75,13 +75,10 @@ userSchema.methods.setAvatar = async function (buffer) {
   const smallAvatar = await sharp(buffer).resize({
     width: 50,
     height: 50
-  }).jpeg().toBuffer();
+  }).png().toBuffer();
 
   user.avatar = avatar;
   user.smallAvatar = smallAvatar;
-
-  // await user.save();
-
 }
 
 userSchema.methods.generateAuthToken = async function () {
