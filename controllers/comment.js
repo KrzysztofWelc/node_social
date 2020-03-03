@@ -97,5 +97,25 @@ router.delete('/',
         }
     }
 )
+router.get('/:post/:comment/image', async (req, res) => {
+    try {
+        const postId = req.params.post;
+        const commentId = req.params.comment;
+
+        const post = await Post.findById(postId);
+        const comment = post.comments.id(commentId);
+        if (!post || !comment.image || !comment) {
+            throw new Error("no such an image");
+        }
+
+        res.set("Content-Type", "image/jpg");
+        res.send(comment.image);
+
+    } catch (e) {
+        res.status(500).send({
+            msg: e.message
+        });
+    }
+})
 
 module.exports = router
