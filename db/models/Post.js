@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Like = require("./Like");
-const commentSchema = require('./commentSchema')
+const commentSchema = require('./commentSchema');
+const sharp = require('sharp');
 
 const postSchema = mongoose.Schema({
   body: String,
@@ -31,6 +32,15 @@ postSchema.pre("remove", async function (next) {
   });
   next();
 });
+
+postSchema.methods.setImage = async function (buffer) {
+  const post = this;
+  const image = await sharp(buffer).resize({
+    width: 700
+  }).png().toBuffer();
+
+  post.image = image;
+}
 
 postSchema.methods.toJSON = function () {
   const post = this;

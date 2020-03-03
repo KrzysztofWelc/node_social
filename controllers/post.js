@@ -13,7 +13,9 @@ router.post(
         ...req.body,
         owner: req.user._id
       });
-      if (req.file) post.image = req.file.buffer;
+      if (req.file) {
+        await post.setImage(req.file.buffer);
+      }
       try {
         await post.save();
         res.status(201).send(post);
