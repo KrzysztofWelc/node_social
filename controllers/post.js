@@ -113,7 +113,8 @@ router.patch(
         if (req.file) {
           console.log("updated image");
 
-          post.image = req.file.buffer;
+          // post.image = req.file.buffer;
+          await post.setImage(req.file.buffer);
         } else if (req.body.delImage) {
           console.log("deleted image");
 
