@@ -37,7 +37,7 @@ postSchema.methods.setImage = async function (buffer) {
   const post = this;
   const image = await sharp(buffer).resize({
     width: 700
-  }).png().toBuffer();
+  }).jpeg().toBuffer();
 
   post.image = image;
 }
