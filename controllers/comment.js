@@ -1,8 +1,8 @@
 const router = require('express').Router()
 const auth = require('../middleware/auth')
 const upload = require('../middleware/upload')
-
 const Post = require('../db/models/Post')
+const sharp = require('sharp');
 
 
 router.post('/add',
@@ -16,8 +16,13 @@ router.post('/add',
                     authorName: user.nickName,
                 };
                 if (req.body.body) comment.body = req.body.body;
-                if (req.file) comment.image = req.file.buffer;
-
+                if (req.file) {
+                    const buffer = req.file.buffer;
+                    const image = await sharp(buffer).resize({
+                        width: 350
+                    }).jpeg().toBuffer();
+                    comment.image = image;
+                }
                 const post = await Post.findById(req.body.postId);
                 post.comments = post.comments.concat([comment]);
                 await post.save();
