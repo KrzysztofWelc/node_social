@@ -55,7 +55,13 @@ router.patch('/',
                 const comment = post.comments.id(commentId);
                 if (String(comment.authorId) == String(userId)) {
                     if (body) comment.body = body;
-                    if (req.file) comment.image = req.file.buffer;
+                    if (req.file) {
+                        const buffer = req.file.buffer;
+                        const image = await sharp(buffer).resize({
+                            width: 350
+                        }).jpeg().toBuffer();
+                        comment.image = image;
+                    }
                     await post.save();
                     res.status(200).send();
                 } else {
