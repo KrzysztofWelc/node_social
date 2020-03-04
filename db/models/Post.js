@@ -48,6 +48,9 @@ postSchema.methods.toJSON = function () {
   const postObject = post.toObject();
 
   delete postObject.image;
+  postObject.comments.forEach(comment => {
+    delete comment.image;
+  });
 
   return postObject;
 };

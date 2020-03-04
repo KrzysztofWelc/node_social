@@ -2,6 +2,7 @@ const router = require('express').Router();
 const auth = require('../middleware/auth');
 
 const Post = require('../db/models/Post');
+const Like = require("../db/models/Like");
 
 
 router.get('/main/:page', auth, async (req, res) => {
@@ -45,6 +46,39 @@ router.get('/me/posts/:page', auth, async (req, res) => {
             sort: {
                 createdAt: -1
             }
+        });
+        res.status(200).send(posts);
+    } catch (e) {
+        res.status(500).send({
+            msg: e.message
+        });
+    }
+})
+
+router.get('/me/likes/:page', auth, async (req, res) => {
+    try {
+        const user = req.user;
+        const page = parseInt(req.params.page, 10);
+        const likes = await Like.find({
+            owner: user._id
+        }, null, {
+            limit: 5,
+            skip: 5 * (page - 1),
+            sort: {
+                createdAt: -1
+            }
+        });
+        if (likes.length === 0) {
+            res.status(200).send([])
+        }
+        const query = likes.map(like => ({
+            _id: like.post
+        }));
+        // console.log(query);
+
+
+        const posts = await Post.find({
+            $or: query
         });
         res.status(200).send(posts);
     } catch (e) {
