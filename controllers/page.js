@@ -88,4 +88,24 @@ router.get('/me/likes/:page', auth, async (req, res) => {
     }
 })
 
+router.get('/user/:id/:page', async (req, res) => {
+    const userId = req.params.id;
+    const page = parseInt(req.params.page, 10);
+    try {
+        const posts = await Post.find({
+            owner: userId
+        }, null, {
+            limit: 5,
+            skip: 5 * page - 1,
+            sort: {
+                createdAt: -1
+            }
+        });
+        res.status(200).send(posts);
+    } catch (e) {
+        res.status(500).send({
+            msg: e.message
+        });
+    }
+})
 module.exports = router;
