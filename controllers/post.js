@@ -87,14 +87,12 @@ router.get("/:id", async (req, res) => {
 });
 
 router.patch(
-  "/:id",
+  "/",
   auth,
   upload.single("image"),
   async (req, res) => {
       try {
-        const {
-          id
-        } = req.params;
+        const id = req.body.postId;
         const post = await Post.findOne({
           _id: id,
           owner: req.user._id
