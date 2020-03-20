@@ -17,5 +17,18 @@ router.get('/preview/:phrase', async(req, res)=>{
     }
 });
 
+router.get('/:phrase', async(req, res)=>{
+    const phrase = req.params.phrase || '';
+
+    try {
+        const profiles = await User.find({$or:[
+                {email: {$regex: phrase}},
+                {nickName: {$regex: phrase}}
+            ]});
+        res.status(200).send(profiles);
+    }catch(e){
+        res.status(500).send({msg: e.message});
+    }
+});
 
 module.exports = router;
