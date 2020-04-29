@@ -14,9 +14,36 @@ router.get('/main/:page', auth, async (req, res) => {
         const query = follows.map(follow => ({
             owner: follow.followedId
         }));
-        const posts = await Post.find({
-            $or: query
-        }, null, {
+
+        let posts;
+        if(query.length){
+            posts = await Post.find({
+                $or: query
+            }, null, {
+                limit: 5,
+                skip: 5 * (parseInt(req.params.page, 10) - 1),
+                sort: {
+                    createdAt: -1
+                }
+            });
+        }else{
+            posts = []
+        }
+
+        res.status(200).send({
+            posts,
+            user: req.user
+        })
+    } catch (e) {
+        res.status(500).send({
+            msg: e.message
+        });
+    }
+})
+
+router.get('/newest/:page', async (req, res) => {
+    try {
+        const posts = await Post.find(null, null, {
             limit: 5,
             skip: 5 * (parseInt(req.params.page, 10) - 1),
             sort: {

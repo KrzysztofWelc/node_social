@@ -24,6 +24,7 @@ router.post(
       if (req.file) {
         await newUser.setAvatar(req.file.buffer);
       }
+
       try {
         const token = await newUser.generateAuthToken();
         res.status(201).json({
